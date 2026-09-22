@@ -7,9 +7,13 @@ class Token:
         return f"{self.tipo}({self.valor})" if self.valor != "" else self.tipo
 
 
+from reservadas import simbolos
+
+
 def tokenizar(texto):
     tokens = []
     pos = 0
+
     while pos < len(texto):
         c = texto[pos]
 
@@ -21,19 +25,13 @@ def tokenizar(texto):
             inicio = pos
             while pos < len(texto) and texto[pos].isdigit():
                 pos += 1
-            tokens.append(Token("NUMERO", int(texto[inicio:pos])))
+            token = Token("NUMERO", int(texto[inicio:pos]))
+            tokens.append(token)
             continue
 
-        simbolos = {
-            "+": "MAS",
-            "-": "MENOS",
-            "*": "POR",
-            "/": "DIV",
-            "(": "PAREN_IZQ",
-            ")": "PAREN_DER",
-        }
         if c in simbolos:
-            tokens.append(Token(simbolos[c], c))
+            token = Token(simbolos[c], c)
+            tokens.append(token)
             pos += 1
             continue
 
@@ -41,3 +39,16 @@ def tokenizar(texto):
 
     tokens.append(Token("EOF", ""))
     return tokens
+
+
+def imprimir_tokens(tokens):
+    ancho_tipo = max(len(tok.tipo) for tok in tokens) + 2
+    ancho_valor = max(len(str(tok.valor)) for tok in tokens) + 2
+    ancho_pos = max(len(str(i)) for i in range(len(tokens))) + 2
+
+    print(f"{'#':<{ancho_pos}}{'TIPO':<{ancho_tipo}}{'VALOR':<{ancho_valor}}")
+    print("-" * (ancho_pos + ancho_tipo + ancho_valor))
+
+    for i, tok in enumerate(tokens):
+        valor = tok.valor if tok.valor != "" else ""
+        print(f"{i:<{ancho_pos}}{tok.tipo:<{ancho_tipo}}{str(valor):<{ancho_valor}}")

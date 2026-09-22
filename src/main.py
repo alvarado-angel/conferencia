@@ -4,7 +4,7 @@ from parser import ErrorSintactico, Parser
 
 from evaluar import evaluar, imprimir_ast, imprimir_cst
 from exportar import exportar_dot
-from lexer import tokenizar
+from lexer import imprimir_tokens, tokenizar
 
 
 def main():
@@ -33,7 +33,12 @@ def main():
     print(f"Expresión leída de '{args.archivo}': {expresion_texto}\n")
 
     try:
+        # scanner
         tokens = tokenizar(expresion_texto)
+        print("=== TOKENS ===")
+        imprimir_tokens(tokens)
+        print()
+        # parser
         cst, ast = Parser(tokens).parsear()
     except (ValueError, ErrorSintactico) as e:
         print(f"[ERROR] {e}")

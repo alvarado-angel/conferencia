@@ -1,4 +1,4 @@
-class NodoCST:
+class Nodo:
     def __init__(self, etiqueta, hijos=None):
         self.etiqueta = etiqueta
         self.hijos = hijos or []
