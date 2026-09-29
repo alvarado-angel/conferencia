@@ -6,7 +6,6 @@ class Token:
     def __repr__(self):
         return f"{self.tipo}({self.valor})" if self.valor != "" else self.tipo
 
-
 from reservadas import simbolos
 
 
@@ -17,10 +16,12 @@ def tokenizar(texto):
     while pos < len(texto):
         c = texto[pos]
 
+        # ruido blanco
         if c in (" ", "\t", "\r", "\n"):
             pos += 1
             continue
 
+        # 1222 -> |1|222 -> |12|22 -> |122|2 -> |1222|
         if c.isdigit():
             inicio = pos
             while pos < len(texto) and texto[pos].isdigit():
@@ -29,6 +30,7 @@ def tokenizar(texto):
             tokens.append(token)
             continue
 
+        # reconocemos simbolos reservados
         if c in simbolos:
             token = Token(simbolos[c], c)
             tokens.append(token)

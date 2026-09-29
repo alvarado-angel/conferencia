@@ -8,7 +8,7 @@ def exportar_dot(raiz, tipo, nombre_archivo):
         '\tlabelloc="t";',
         "\tfontsize=20;",
         '\tfontname="Arial";',
-        "\tnode [shape=box];",
+        "\tnode [shape=circle];",
     ]
     contador = 0
 

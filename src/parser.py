@@ -25,6 +25,7 @@ class Parser:
             raise ErrorSintactico(f"Token inesperado: {self._actual()}")
         return cst, ast
 
+    # Expresion -> Termino ((+|-) Termino)*
     def _expresion(self):
         cst_izq, ast = self._termino()
         hijos_cst = [cst_izq]
@@ -36,6 +37,7 @@ class Parser:
             ast = BinOp(ast, op_tok.valor, ast_der)
         return Nodo("expresion", hijos_cst), ast
 
+    # Termino -> Factor ((*|/) Factor)*
     def _termino(self):
         cst_izq, ast = self._factor()
         hijos_cst = [cst_izq]
@@ -47,6 +49,7 @@ class Parser:
             ast = BinOp(ast, op_tok.valor, ast_der)
         return Nodo("termino", hijos_cst), ast
 
+    # Factor -> (- Factor) | Primario
     def _factor(self):
         if self._actual().tipo == "MENOS":
             self._avanzar()
@@ -57,6 +60,7 @@ class Parser:
         cst_primario, ast_primario = self._primario()
         return Nodo("factor", [cst_primario]), ast_primario
 
+    # Primario -> NUMERO | '(' Expresion ')'
     def _primario(self):
         tok = self._actual()
         if tok.tipo == "NUMERO":

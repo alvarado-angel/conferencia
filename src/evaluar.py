@@ -26,7 +26,7 @@ def imprimir_arbol(
     print(f"{prefijo}{conector}[{obtener_etiqueta(nodo)}]")
 
     hijos = obtener_hijos(nodo)
-    extension = "" if es_raiz else ("    " if es_ultimo else "│   ")
+    extension = "" if es_raiz else ("\t" if es_ultimo else "│\t")
     nuevo_prefijo = prefijo + extension
     for i, hijo in enumerate(hijos):
         imprimir_arbol(
