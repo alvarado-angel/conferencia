@@ -9,6 +9,9 @@ def exportar_dot(raiz, tipo, nombre_archivo):
         "\tfontsize=20;",
         '\tfontname="Arial";',
         "\tnode [shape=circle];",
+        '\tnode [shape=circle, style="filled", fillcolor="#EBF5FB", color="#2980B9", fontname="Helvetica",',
+        '\t\tfontcolor="#2C3E50", penwidth=2, width=0.8];',
+        '\tedge [color="#7F8C8D", penwidth=1.5];',
     ]
     contador = 0
 
