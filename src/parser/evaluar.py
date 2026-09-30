@@ -1,20 +1,20 @@
-from nodos import BinOp, Numero, UnaryOp
+from .nodos import Numero, OpBinario, OpUnario
 
 
 def _etiqueta_ast(nodo):
     if isinstance(nodo, Numero):
         return str(nodo.valor)
-    if isinstance(nodo, UnaryOp):
+    if isinstance(nodo, OpUnario):
         return "- (unario)"
-    if isinstance(nodo, BinOp):
+    if isinstance(nodo, OpBinario):
         return nodo.operador
     return "?"
 
 
 def _hijos_ast(nodo):
-    if isinstance(nodo, BinOp):
+    if isinstance(nodo, OpBinario):
         return [nodo.izquierda, nodo.derecha]
-    if isinstance(nodo, UnaryOp):
+    if isinstance(nodo, OpUnario):
         return [nodo.operando]
     return []
 
@@ -50,9 +50,9 @@ def imprimir_ast(nodo_ast):
 def evaluar(nodo):
     if isinstance(nodo, Numero):
         return nodo.valor
-    if isinstance(nodo, UnaryOp):
+    if isinstance(nodo, OpUnario):
         return -evaluar(nodo.operando)
-    if isinstance(nodo, BinOp):
+    if isinstance(nodo, OpBinario):
         izq = evaluar(nodo.izquierda)
         der = evaluar(nodo.derecha)
         if nodo.operador == "+":

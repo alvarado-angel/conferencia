@@ -1,4 +1,4 @@
-from nodos import BinOp, Numero, UnaryOp
+from .nodos import Numero, OpBinario, OpUnario
 
 
 def exportar_dot(raiz, tipo, nombre_archivo):
@@ -35,10 +35,10 @@ def exportar_dot(raiz, tipo, nombre_archivo):
         if isinstance(nodo, Numero):
             etiqueta = str(nodo.valor)
             hijos = []
-        elif isinstance(nodo, UnaryOp):
+        elif isinstance(nodo, OpUnario):
             etiqueta = "-"
             hijos = [nodo.operando]
-        elif isinstance(nodo, BinOp):
+        elif isinstance(nodo, OpBinario):
             etiqueta = nodo.operador
             hijos = [nodo.izquierda, nodo.derecha]
         else:
