@@ -1,4 +1,4 @@
-from .nodos import Numero, OpBinario, OpUnario
+from .nodos import Nodo, Numero, OpBinario, OpUnario
 
 
 def exportar_dot(raiz, tipo, nombre_archivo):
@@ -27,7 +27,7 @@ def exportar_dot(raiz, tipo, nombre_archivo):
             lineas.append(f"\t{id_actual} -> {id_hijo};")
         return id_actual
 
-    def _recorrer_ast(nodo):
+    def _recorrer_ast(nodo: Nodo):
         nonlocal contador
         id_actual = f"node{contador}"
         contador += 1
@@ -40,7 +40,7 @@ def exportar_dot(raiz, tipo, nombre_archivo):
             hijos = [nodo.operando]
         elif isinstance(nodo, OpBinario):
             etiqueta = nodo.operador
-            hijos = [nodo.izquierda, nodo.derecha]
+            hijos = [nodo.operando_izq, nodo.operando_der]
         else:
             etiqueta = "?"
             hijos = []
@@ -62,4 +62,4 @@ def exportar_dot(raiz, tipo, nombre_archivo):
 
     with open(nombre_archivo, "w", encoding="utf-8") as f:
         f.write("\n".join(lineas))
-    print(f" A[rchivo DOT exportado exitosamente como '{nombre_archivo}'")
+    print(f" Archivo DOT exportado exitosamente como '{nombre_archivo}'")

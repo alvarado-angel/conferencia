@@ -13,7 +13,7 @@ class Parser:
 
     def _avanzar(self) -> Token:
         token = self.tokens[self.pos]
-        if token.tipo == "EOF":
+        if token.tipo != "EOF":
             self.pos += 1
         return token
 
@@ -64,19 +64,19 @@ class Parser:
         if self._actual().tipo == "MENOS":
             self._avanzar()
             cst_operando, ast_operando = self._fact()
-            cst = Nodo("fact", [Nodo("-")], cst_operando)
+            cst = Nodo("fact", [Nodo("-"), cst_operando])
             ast = OpUnario(ast_operando)
             return cst, ast
 
         cst_prim, ast_prim = self._prim()
-        return Nodo("factor", [cst_prim]), ast_prim
+        return Nodo("fact", [cst_prim]), ast_prim
 
     def _prim(self):
         token = self._actual()
 
         if token.tipo == "NUMERO":
             self._avanzar()
-            cst = Nodo("primario", [Nodo(f"NUMERO: {token.valor}")])
+            cst = Nodo("prim", [Nodo(token.valor)])
             return cst, Numero(token.valor)
 
         if token.tipo == "PAR_IZQ":
@@ -96,7 +96,7 @@ class Parser:
         )
 
     def parsear(self):
-        cst, ast = self._expresion()
+        cst, ast = self._expr()
         if self._actual().tipo != "EOF":
             raise ErrorSintactico(f"Token inesperado: {self._actual()}")
         return cst, ast

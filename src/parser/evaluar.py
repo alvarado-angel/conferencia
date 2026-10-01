@@ -1,7 +1,9 @@
-from .nodos import Numero, OpBinario, OpUnario
+from scanner import Token
+
+from .nodos import Nodo, Numero, OpBinario, OpUnario
 
 
-def _etiqueta_ast(nodo):
+def _etiqueta_ast(nodo: Nodo):
     if isinstance(nodo, Numero):
         return str(nodo.valor)
     if isinstance(nodo, OpUnario):
@@ -11,9 +13,9 @@ def _etiqueta_ast(nodo):
     return "?"
 
 
-def _hijos_ast(nodo):
+def _hijos_ast(nodo: Nodo):
     if isinstance(nodo, OpBinario):
-        return [nodo.izquierda, nodo.derecha]
+        return [nodo.operando_izq, nodo.operando_der]
     if isinstance(nodo, OpUnario):
         return [nodo.operando]
     return []
@@ -47,14 +49,14 @@ def imprimir_ast(nodo_ast):
     imprimir_arbol(nodo_ast, _etiqueta_ast, _hijos_ast)
 
 
-def evaluar(nodo):
+def evaluar(nodo: Nodo):
     if isinstance(nodo, Numero):
         return nodo.valor
     if isinstance(nodo, OpUnario):
         return -evaluar(nodo.operando)
     if isinstance(nodo, OpBinario):
-        izq = evaluar(nodo.izquierda)
-        der = evaluar(nodo.derecha)
+        izq = evaluar(nodo.operando_izq)
+        der = evaluar(nodo.operando_der)
         if nodo.operador == "+":
             return izq + der
         if nodo.operador == "-":

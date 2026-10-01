@@ -1,7 +1,7 @@
 class Nodo:
     def __init__(self, etiqueta, hijos=None):
         self.etiqueta = etiqueta
-        self.hijos = hijos
+        self.hijos = hijos or []
 
 
 class OpBinario:
@@ -17,8 +17,8 @@ class OpUnario:
 
 
 class Numero:
-    def __init__(self, operando):
-        self.operando = operando
+    def __init__(self, valor):
+        self.valor = valor
 
 
 # formalidad del manejo de errores
