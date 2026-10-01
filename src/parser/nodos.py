@@ -4,14 +4,14 @@ class Nodo:
         self.hijos = hijos or []
 
 
-class BinOp:
-    def __init__(self, izquierda, operador, derecha):
-        self.izquierda = izquierda
+class OpBinario:
+    def __init__(self, operando_izq, operador, operando_der):
+        self.operando_izq = operando_izq
         self.operador = operador
-        self.derecha = derecha
+        self.operando_der = operando_der
 
 
-class UnaryOp:
+class OpUnario:
     def __init__(self, operando):
         self.operando = operando
 
@@ -19,3 +19,8 @@ class UnaryOp:
 class Numero:
     def __init__(self, valor):
         self.valor = valor
+
+
+# formalidad del manejo de errores
+class ErrorSintactico(Exception):
+    pass

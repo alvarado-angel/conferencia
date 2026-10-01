@@ -1,63 +1,79 @@
 import argparse
 import sys
-from parser import ErrorSintactico, Parser
 
-from evaluar import evaluar, imprimir_ast, imprimir_cst
-from exportar import exportar_dot
-from lexer import imprimir_tokens, tokenizar
+from parser import (
+    ErrorSintactico,
+    Parser,
+    evaluar,
+    exportar_dot,
+    imprimir_ast,
+    imprimir_cst,
+)
+from scanner.lexer import ErrorLexico, imprimir_tokens, tokenizar
 
 
 def main():
-    argp = argparse.ArgumentParser(description="Procesa expresiones y genera AST/CST.")
-    argp.add_argument("archivo", help="Ruta al archivo con la expresión")
-    argp.add_argument(
+    # argumentos y parametros
+    args = argparse.ArgumentParser(
+        description="Procesa expresiones y genera árbol CST o AST."
+    )
+    args.add_argument("archivo", help="archivo que contiene la expresión a analizar.")
+    args.add_argument(
         "--arbol",
         choices=["cst", "ast"],
         required=True,
-        help="Tipo de árbol: 'cst' o 'ast'",
+        help="Tipo de árbol que queremos generar (cst o ast).",
     )
-    argp.add_argument(
+    args.add_argument(
         "--exportar",
         action="store_true",
-        help="Exporta el árbol a un archivo .dot (cst.dot o ast.dot)",
+        help="Genera un archivo con código graphviz del árbol generado.",
     )
-    args = argp.parse_args()
+    args = args.parse_args()
 
+    # abriendo el archivo
     try:
-        with open(args.archivo, "r", encoding="utf-8") as f:
-            expresion_texto = f.read().strip()
+        with open(args.archivo, "r", encoding="utf-8") as contenido:
+            entrada = contenido.read().strip()
     except FileNotFoundError:
-        print(f"[ERROR] No se encontró el archivo '{args.archivo}'")
+        print(f"[ERROR]: No se ha encontrado el archivo {args.archivo}.")
         sys.exit(1)
 
-    print(f"Expresión leída de '{args.archivo}': {expresion_texto}\n")
+    # entrada recibida
+    print(f" {'==' * 4} CADENA DE ENTRADA {'==' * 4} ")
+    print(f'"{entrada}"')
+    print()
 
     try:
         # scanner
-        tokens = tokenizar(expresion_texto)
-        print("=== TOKENS ===")
+        tokens = tokenizar(entrada)
+        print(f" {'==' * 4} TOKENS {'==' * 4} ")
         imprimir_tokens(tokens)
         print()
         # parser
         cst, ast = Parser(tokens).parsear()
-    except (ValueError, ErrorSintactico) as e:
-        print(f"[ERROR] {e}")
+    except (ErrorLexico, ErrorSintactico) as e:
+        print(e)
         sys.exit(1)
 
+    # generación del árbol y exportación
     if args.arbol == "cst":
-        print("=== ÁRBOL DE ANÁLISIS SINTÁCTICO (CST) ===")
+        print(f" {'==' * 4} ÁRBOL DE ANÁLISIS SINTÁCTICO (CST)  {'==' * 4} ")
         imprimir_cst(cst)
         if args.exportar:
             exportar_dot(cst, "cst", "cst.dot")
     else:
-        print("=== ÁRBOL DE SINTAXIS ABSTRACTA (AST) ===")
+        print(f" {'==' * 4} ÁRBOL DE SINTAXIS ABSTRACTA (AST)  {'==' * 4} ")
         imprimir_ast(ast)
         if args.exportar:
             exportar_dot(ast, "ast", "ast.dot")
+    print()
 
+    # resultado final
     resultado = evaluar(ast)
-    print("\n=== RESULTADO ===")
-    print(f"  {resultado}")
+    print(f" {'==' * 4} RESULTADO  {'==' * 4} ")
+    print(resultado)
+    print()
 
 
 if __name__ == "__main__":
