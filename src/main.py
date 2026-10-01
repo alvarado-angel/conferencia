@@ -2,14 +2,13 @@ import argparse
 import sys
 
 from parser import (
-    ErrorSintactico,
     Parser,
     evaluar,
     exportar_dot,
     imprimir_ast,
     imprimir_cst,
 )
-from scanner.lexer import ErrorLexico, imprimir_tokens, tokenizar
+from scanner.lexer import imprimir_tokens, tokenizar
 
 
 def main():
@@ -44,17 +43,28 @@ def main():
     print(f'"{entrada}"')
     print()
 
-    try:
-        # scanner
-        tokens = tokenizar(entrada)
-        print(f" {'==' * 4} TOKENS {'==' * 4} ")
-        imprimir_tokens(tokens)
+    # scanner
+    tokens, errores = tokenizar(entrada)
+    print(f" {'==' * 4} TOKENS {'==' * 4} ")
+    imprimir_tokens(tokens)
+    print()
+
+    ## errores del scanner
+    if len(errores) != 0:
+        print(f" {'==' * 4} ERRORES LÉXICOS {'==' * 4} ")
+        print(*errores, sep="\n")
+        print()  # no detenemos
+
+    # parser
+    parser = Parser(tokens)
+    cst, ast = parser.parsear()
+
+    # errores del parser
+    if len(parser.errores) != 0:
+        print(f" {'==' * 4} ERRORES SINTÁCTICOS {'==' * 4} ")
+        print(*parser.errores, sep="\n")
         print()
-        # parser
-        cst, ast = Parser(tokens).parsear()
-    except (ErrorLexico, ErrorSintactico) as e:
-        print(e)
-        sys.exit(1)
+        sys.exit(1)  # detenemos
 
     # generación del árbol y exportación
     if args.arbol == "cst":

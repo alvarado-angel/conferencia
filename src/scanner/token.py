@@ -16,7 +16,7 @@ class ErrorLexico(Exception):
 
 
 # imprime la tabla de tokens
-def imprimir_tokens(tokens: list[Token]):
+def imprimir_tokens(tokens: list[Token]) -> None:
     ancho_pos = max(len(str(i)) for i in range(len(tokens))) + 2
     ancho_tipo = max(len(tok.tipo) for tok in tokens) + 2
     ancho_valor = max(len(str(tok.valor)) for tok in tokens) + 2
