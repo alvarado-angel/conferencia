@@ -70,7 +70,8 @@ class Parser:
             self._avanzar()
             cst_operando, ast_operando = self._F()
             cst = Nodo("F", [Nodo("-"), cst_operando])
-            return cst, OpUnario(ast_operando)
+            ast = OpUnario(ast_operando)
+            return cst, ast
 
         cst_P, ast_P = self._P()
         return Nodo("F", [cst_P]), ast_P
@@ -82,16 +83,20 @@ class Parser:
             self._avanzar()
             cst_exp, ast_exp = self._F()
             cst = Nodo("P", [cst_base, Nodo("**"), cst_exp])
-            return cst, OpBinario(ast, "**", ast_exp)
+            ast = OpBinario(ast, "**", ast_exp)
+            return cst, ast
 
-        return Nodo("P", [cst_base]), ast
+        cst = Nodo("P", [cst_base])
+        return cst, ast
 
     def _V(self):
         token = self._actual()
 
         if token.tipo == "NUMERO":
             self._avanzar()
-            return Nodo("V", [Nodo(token.valor)]), Numero(token.valor)
+            cst = Nodo("V", [Nodo(token.valor)])
+            ast = Numero(token.valor)
+            return cst, ast
 
         if token.tipo == "PAR_IZQ":
             self._avanzar()
@@ -118,9 +123,11 @@ class Parser:
         cst, ast = self._E()
 
         if self._actual().tipo != "EOF":
-            self._error(ErrorSintactico(f"Token inesperado: {self._actual()}"))
+            err = ErrorSintactico(f"Token inesperado: {self._actual()}")
+            self._error(err)
             self._sincronizar()
 
         if self.errores:
             return None, None
+
         return cst, ast
