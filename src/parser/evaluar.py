@@ -57,12 +57,16 @@ def evaluar(nodo: Nodo):
     if isinstance(nodo, OpBinario):
         izq = evaluar(nodo.operando_izq)
         der = evaluar(nodo.operando_der)
-        if nodo.operador == "+":
-            return izq + der
-        if nodo.operador == "-":
-            return izq - der
-        if nodo.operador == "*":
-            return izq * der
-        if nodo.operador == "/":
-            return izq / der
+        match nodo.operador:
+            case "+":
+                return izq + der
+            case "-":
+                return izq - der
+            case "*":
+                return izq * der
+            case "/":
+                return izq / der
+            case "**":
+                return izq**der
+
     raise TypeError(f"Nodo no reconocido: {nodo}")

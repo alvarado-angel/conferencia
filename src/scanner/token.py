@@ -4,10 +4,10 @@ class Token:
         self.valor = valor
 
     def __repr__(self):
-        return f"<{self.tipo}, {self.tipo if self.valor != 'EOF' else ''}>"
+        return f"<{self.tipo}, {self.valor if self.valor != 'EOF' else ''}>"
 
     def __str__(self):
-        return f"{self.tipo}({self.valor if self.valor != 'EOF' else ''})"
+        return f"<{self.tipo}, {self.valor if self.valor != 'EOF' else ''}>"
 
 
 # formalidad del manejo de errores
@@ -16,7 +16,7 @@ class ErrorLexico(Exception):
 
 
 # imprime la tabla de tokens
-def imprimir_tokens(tokens: list[Token]):
+def imprimir_tokens(tokens: list[Token]) -> None:
     ancho_pos = max(len(str(i)) for i in range(len(tokens))) + 2
     ancho_tipo = max(len(tok.tipo) for tok in tokens) + 2
     ancho_valor = max(len(str(tok.valor)) for tok in tokens) + 2

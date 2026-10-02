@@ -6,97 +6,121 @@ from .nodos import *
 class Parser:
     def __init__(self, tokens: list[Token]):
         self.tokens = tokens
+        self.errores = []
         self.pos = 0
 
+    # token actual
     def _actual(self) -> Token:
         return self.tokens[self.pos]
 
+    # avanzar al siguiente token
     def _avanzar(self) -> Token:
         token = self.tokens[self.pos]
         if token.tipo != "EOF":
             self.pos += 1
         return token
 
-    # expr -> term '+'/'-' term
-    #     | term
-    # term -> fact '*'/'/' fact
-    #     | fact
-    # fact -> '-' fact
-    #     | prim
-    # prim -> '(' expr ')'
-    #     | numero
+    # errores
+    def _error(self, err: Exception) -> None:
+        self.errores.append(err)
 
-    def _expr(self):
-        hijos_cst = []
+    def _sincronizar(self) -> None:
+        while self._actual().tipo != "EOF":
+            self._avanzar()
 
-        cst_izq, ast = self._term()
-        hijos_cst.append(cst_izq)
+    # gramática
+    # S -> E 'EOF'
+    # E -> E '+'/'-' T
+    #   | T
+    # T -> T '*'/'/' F
+    #   | F
+    # F -> '-' F
+    #   | P
+    # P -> V ** F
+    #   | V
+    # V -> '(' E ')'
+    #   | numero
+
+    def _E(self):
+        cst_izq, ast = self._T()
+        cst = Nodo("E", [cst_izq])
 
         while self._actual().tipo in ("MAS", "MENOS"):
             operador = self._avanzar()
-            nodo = Nodo(operador.valor)
-            hijos_cst.append(nodo)
-
-            cst_der, ast_der = self._term()
-            hijos_cst.append(cst_der)
+            cst_der, ast_der = self._T()
+            cst = Nodo("E", [cst, Nodo(operador.valor), cst_der])
             ast = OpBinario(ast, operador.valor, ast_der)
 
-        return Nodo("expr", hijos_cst), ast
+        return cst, ast
 
-    def _term(self):
-        hijos_cst = []
-
-        cst_izq, ast = self._fact()
-        hijos_cst.append(cst_izq)
+    def _T(self):
+        cst_izq, ast = self._F()
+        cst = Nodo("T", [cst_izq])
 
         while self._actual().tipo in ("POR", "DIV"):
             operador = self._avanzar()
-            nodo = Nodo(operador.valor)
-            hijos_cst.append(nodo)
-
-            cst_der, ast_der = self._fact()
-            hijos_cst.append(cst_der)
+            cst_der, ast_der = self._F()
+            cst = Nodo("T", [cst, Nodo(operador.valor), cst_der])
             ast = OpBinario(ast, operador.valor, ast_der)
 
-        return Nodo("term", hijos_cst), ast
+        return cst, ast
 
-    def _fact(self):
+    def _F(self):
         if self._actual().tipo == "MENOS":
             self._avanzar()
-            cst_operando, ast_operando = self._fact()
-            cst = Nodo("fact", [Nodo("-"), cst_operando])
-            ast = OpUnario(ast_operando)
-            return cst, ast
+            cst_operando, ast_operando = self._F()
+            cst = Nodo("F", [Nodo("-"), cst_operando])
+            return cst, OpUnario(ast_operando)
 
-        cst_prim, ast_prim = self._prim()
-        return Nodo("fact", [cst_prim]), ast_prim
+        cst_P, ast_P = self._P()
+        return Nodo("F", [cst_P]), ast_P
 
-    def _prim(self):
+    def _P(self):
+        cst_base, ast = self._V()
+
+        if self._actual().tipo == "EXPO":
+            self._avanzar()
+            cst_exp, ast_exp = self._F()
+            cst = Nodo("P", [cst_base, Nodo("**"), cst_exp])
+            return cst, OpBinario(ast, "**", ast_exp)
+
+        return Nodo("P", [cst_base]), ast
+
+    def _V(self):
         token = self._actual()
 
         if token.tipo == "NUMERO":
             self._avanzar()
-            cst = Nodo("prim", [Nodo(token.valor)])
-            return cst, Numero(token.valor)
+            return Nodo("V", [Nodo(token.valor)]), Numero(token.valor)
 
         if token.tipo == "PAR_IZQ":
             self._avanzar()
-            cst_expr, ast_expr = self._expr()
-            if self._actual().tipo != "PAR_DER":
-                raise ErrorSintactico(
-                    f'[ERROR SINTACTICO]: Se esperaba un ")", se encontró {token}'
+            cst_E, ast_E = self._E()
+
+            if self._actual().tipo == "PAR_DER":
+                self._avanzar()
+            elif not self.errores:  # si ya hay error, no reportes en cascada
+                self._error(
+                    ErrorSintactico(f'Se esperaba ")", se encontró {self._actual()}')
                 )
+                self._sincronizar()
 
-            self._avanzar()
-            cst = Nodo("prim", [Nodo("("), cst_expr, Nodo(")")])
-            return cst, ast_expr
+            return Nodo("V", [Nodo("("), cst_E, Nodo(")")]), ast_E
 
-        raise ErrorSintactico(
-            f'[ERROR SINTACTICO]: se esperaba un número o "(", se encontró: {token}'
+        # no hay número ni "("
+        self._error(
+            ErrorSintactico(f'Se esperaba un número o "(", se encontró: {token}')
         )
+        self._sincronizar()
+        return None, None
 
     def parsear(self):
-        cst, ast = self._expr()
+        cst, ast = self._E()
+
         if self._actual().tipo != "EOF":
-            raise ErrorSintactico(f"Token inesperado: {self._actual()}")
+            self._error(ErrorSintactico(f"Token inesperado: {self._actual()}"))
+            self._sincronizar()
+
+        if self.errores:
+            return None, None
         return cst, ast

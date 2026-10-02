@@ -1,3 +1,5 @@
+import os
+
 from .nodos import Nodo, Numero, OpBinario, OpUnario
 
 
@@ -60,6 +62,12 @@ def exportar_dot(raiz, tipo, nombre_archivo):
 
     lineas.append("}\n")
 
-    with open(nombre_archivo, "w", encoding="utf-8") as f:
+    # guardar
+    os.makedirs("output", exist_ok=True)
+    ruta = os.path.join("output", nombre_archivo)
+    with open(ruta, "w", encoding="utf-8") as f:
         f.write("\n".join(lineas))
+
+    print(f" {'==' * 4} EXPORTACIÓN A DOT {'==' * 4} ")
     print(f" Archivo DOT exportado exitosamente como '{nombre_archivo}'")
+    print()

@@ -1,15 +1,32 @@
 import argparse
+import os
 import sys
 
 from parser import (
-    ErrorSintactico,
     Parser,
     evaluar,
     exportar_dot,
     imprimir_ast,
     imprimir_cst,
 )
-from scanner.lexer import ErrorLexico, imprimir_tokens, tokenizar
+from scanner.lexer import imprimir_tokens, tokenizar
+
+
+def exportar_errores_md(errores, nombre_archivo="errores.md"):
+    filas = [
+        "| # | Tipo | Mensaje |",
+        "|---|---|---|",
+    ]
+    for i, e in enumerate(errores, start=1):
+        tipo = "Léxico" if type(e).__name__ == "ErrorLexico" else "Sintáctico"
+        mensaje = str(e).replace("|", "\\|").replace("\n", " ")
+        filas.append(f"| {i} | {tipo} | {mensaje} |")
+
+    os.makedirs("output", exist_ok=True)
+    ruta = os.path.join("output", nombre_archivo)
+    with open(ruta, "w", encoding="utf-8") as f:
+        f.write("\n".join(filas) + "\n")
+    print(f" Errores exportados en '{ruta}'")
 
 
 def main():
@@ -39,35 +56,46 @@ def main():
         print(f"[ERROR]: No se ha encontrado el archivo {args.archivo}.")
         sys.exit(1)
 
-    # entrada recibida
+    # entrada
     print(f" {'==' * 4} CADENA DE ENTRADA {'==' * 4} ")
     print(f'"{entrada}"')
     print()
 
-    try:
-        # scanner
-        tokens = tokenizar(entrada)
-        print(f" {'==' * 4} TOKENS {'==' * 4} ")
-        imprimir_tokens(tokens)
+    # scanner
+    tokens, errores = tokenizar(entrada)
+    print(f" {'==' * 4} TOKENS {'==' * 4} ")
+    imprimir_tokens(tokens)
+    print()
+
+    # parser
+    parser = Parser(tokens)
+    cst, ast = parser.parsear()
+
+    # errores del parser
+    if len(parser.errores) != 0:
+        errores.extend(parser.errores)
+        exportar_errores_md(errores)
+
+        print(f" {'==' * 4} ERRORES {'==' * 4} ")
+        print(
+            "Se han detectado errores que no permiten continuar la ejecución del programa."
+        )
         print()
-        # parser
-        cst, ast = Parser(tokens).parsear()
-    except (ErrorLexico, ErrorSintactico) as e:
-        print(e)
-        sys.exit(1)
+        sys.exit(1)  # detenemos
 
     # generación del árbol y exportación
     if args.arbol == "cst":
         print(f" {'==' * 4} ÁRBOL DE ANÁLISIS SINTÁCTICO (CST)  {'==' * 4} ")
         imprimir_cst(cst)
+        print()
         if args.exportar:
             exportar_dot(cst, "cst", "cst.dot")
     else:
         print(f" {'==' * 4} ÁRBOL DE SINTAXIS ABSTRACTA (AST)  {'==' * 4} ")
         imprimir_ast(ast)
+        print()
         if args.exportar:
             exportar_dot(ast, "ast", "ast.dot")
-    print()
 
     # resultado final
     resultado = evaluar(ast)
