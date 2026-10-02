@@ -1,4 +1,4 @@
 from .lexer import tokenizar
-from .token import ErrorLexico, Token, imprimir_tokens
+from .token import ErrorLexico, Token, exportar_tokens
 
-__all__ = ["ErrorLexico", "Token", "imprimir_tokens", "tokenizar"]
+__all__ = ["ErrorLexico", "Token", "exportar_tokens", "tokenizar"]

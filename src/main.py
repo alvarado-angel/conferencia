@@ -9,17 +9,16 @@ from parser import (
     imprimir_ast,
     imprimir_cst,
 )
-from scanner.lexer import imprimir_tokens, tokenizar
+from scanner.lexer import exportar_tokens, tokenizar
 
 
 def exportar_errores_md(errores, nombre_archivo="errores.md"):
-    filas = [
-        "| # | Tipo | Mensaje |",
-        "|---|---|---|",
-    ]
-    for i, e in enumerate(errores, start=1):
-        tipo = "Léxico" if type(e).__name__ == "ErrorLexico" else "Sintáctico"
-        mensaje = str(e).replace("|", "\\|").replace("\n", " ")
+    filas = ["| # | Tipo | Mensaje |"]
+    filas.append("|---|---|---|")
+
+    for i, err in enumerate(errores, start=1):
+        tipo = "Léxico" if type(err).__name__ == "ErrorLexico" else "Sintáctico"
+        mensaje = str(err)
         filas.append(f"| {i} | {tipo} | {mensaje} |")
 
     os.makedirs("output", exist_ok=True)
@@ -63,9 +62,7 @@ def main():
 
     # scanner
     tokens, errores = tokenizar(entrada)
-    print(f" {'==' * 4} TOKENS {'==' * 4} ")
-    imprimir_tokens(tokens)
-    print()
+    exportar_tokens(tokens)
 
     # parser
     parser = Parser(tokens)
