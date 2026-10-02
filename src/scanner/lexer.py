@@ -40,9 +40,7 @@ def tokenizar(cadena: str) -> tuple[list[Token], list[Exception]]:
 
         # manejar errores
         errores.append(
-            ErrorLexico(
-                f'[ERROR LEXICO]: El caracter "{caracter}" no pertenece al lenguaje.'
-            )
+            ErrorLexico(f'El caracter "{caracter}" no pertenece al lenguaje.')
         )
         pos += 1
 

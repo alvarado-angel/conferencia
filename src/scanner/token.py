@@ -4,10 +4,10 @@ class Token:
         self.valor = valor
 
     def __repr__(self):
-        return f"<{self.tipo}, {self.tipo if self.valor != 'EOF' else ''}>"
+        return f"<{self.tipo}, {self.valor if self.valor != 'EOF' else ''}>"
 
     def __str__(self):
-        return f"{self.tipo}({self.valor if self.valor != 'EOF' else ''})"
+        return f"<{self.tipo}, {self.valor if self.valor != 'EOF' else ''}>"
 
 
 # formalidad del manejo de errores

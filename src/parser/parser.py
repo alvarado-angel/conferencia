@@ -43,33 +43,27 @@ class Parser:
 
     def _E(self):
         cst_izq, ast = self._T()
-        hijos_cst = [cst_izq]
+        cst = Nodo("E", [cst_izq])
 
         while self._actual().tipo in ("MAS", "MENOS"):
             operador = self._avanzar()
-            nodo = Nodo(operador.valor)
-            hijos_cst.append(nodo)
-
             cst_der, ast_der = self._T()
-            hijos_cst.append(cst_der)
+            cst = Nodo("E", [cst, Nodo(operador.valor), cst_der])
             ast = OpBinario(ast, operador.valor, ast_der)
 
-        return Nodo("E", hijos_cst), ast
+        return cst, ast
 
     def _T(self):
         cst_izq, ast = self._F()
-        hijos_cst = [cst_izq]
+        cst = Nodo("T", [cst_izq])
 
         while self._actual().tipo in ("POR", "DIV"):
             operador = self._avanzar()
-            nodo = Nodo(operador.valor)
-            hijos_cst.append(nodo)
-
             cst_der, ast_der = self._F()
-            hijos_cst.append(cst_der)
+            cst = Nodo("T", [cst, Nodo(operador.valor), cst_der])
             ast = OpBinario(ast, operador.valor, ast_der)
 
-        return Nodo("T", hijos_cst), ast
+        return cst, ast
 
     def _F(self):
         if self._actual().tipo == "MENOS":
@@ -107,9 +101,7 @@ class Parser:
                 self._avanzar()
             elif not self.errores:  # si ya hay error, no reportes en cascada
                 self._error(
-                    ErrorSintactico(
-                        f'[ERROR SINTACTICO]: Se esperaba ")", se encontró {self._actual()}'
-                    )
+                    ErrorSintactico(f'Se esperaba ")", se encontró {self._actual()}')
                 )
                 self._sincronizar()
 
@@ -117,9 +109,7 @@ class Parser:
 
         # no hay número ni "("
         self._error(
-            ErrorSintactico(
-                f'[ERROR SINTACTICO]: se esperaba un número o "(", se encontró: {token}'
-            )
+            ErrorSintactico(f'Se esperaba un número o "(", se encontró: {token}')
         )
         self._sincronizar()
         return None, None
@@ -128,11 +118,7 @@ class Parser:
         cst, ast = self._E()
 
         if self._actual().tipo != "EOF":
-            self._error(
-                ErrorSintactico(
-                    f"[ERROR SINTACTICO]: Token inesperado: {self._actual()}"
-                )
-            )
+            self._error(ErrorSintactico(f"Token inesperado: {self._actual()}"))
             self._sincronizar()
 
         if self.errores:
