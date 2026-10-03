@@ -104,7 +104,7 @@ class Parser:
 
             if self._actual().tipo == "PAR_DER":
                 self._avanzar()
-            elif not self.errores:  # si ya hay error, no reportes en cascada
+            elif not self.errores:  # evitamos la cascada de errores
                 self._error(
                     ErrorSintactico(f'Se esperaba ")", se encontró {self._actual()}')
                 )
@@ -112,7 +112,6 @@ class Parser:
 
             return Nodo("V", [Nodo("("), cst_E, Nodo(")")]), ast_E
 
-        # no hay número ni "("
         self._error(
             ErrorSintactico(f'Se esperaba un número o "(", se encontró: {token}')
         )
@@ -120,8 +119,10 @@ class Parser:
         return None, None
 
     def parsear(self):
+        # aquí empieza todo
         cst, ast = self._E()
 
+        # si el token actual no es EOF entonces tenemos un error
         if self._actual().tipo != "EOF":
             err = ErrorSintactico(f"Token inesperado: {self._actual()}")
             self._error(err)

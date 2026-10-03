@@ -63,8 +63,8 @@ def exportar_dot(raiz, tipo, nombre_archivo):
     lineas.append("}\n")
 
     # guardar
-    os.makedirs("output", exist_ok=True)
-    ruta = os.path.join("output", nombre_archivo)
+    os.makedirs("outputs", exist_ok=True)
+    ruta = os.path.join("outputs", nombre_archivo)
     with open(ruta, "w", encoding="utf-8") as f:
         f.write("\n".join(lineas))
 
