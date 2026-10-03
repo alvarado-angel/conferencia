@@ -21,8 +21,8 @@ def exportar_errores_md(errores, nombre_archivo="errores.md"):
         mensaje = str(err)
         filas.append(f"| {i} | {tipo} | {mensaje} |")
 
-    os.makedirs("output", exist_ok=True)
-    ruta = os.path.join("output", nombre_archivo)
+    os.makedirs("outputs", exist_ok=True)
+    ruta = os.path.join("outputs", nombre_archivo)
     with open(ruta, "w", encoding="utf-8") as f:
         f.write("\n".join(filas) + "\n")
     print(f" Errores exportados en '{ruta}'")

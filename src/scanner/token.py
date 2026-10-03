@@ -28,8 +28,8 @@ def exportar_tokens(tokens: list[Token]) -> None:
         lineas.append(f"| {i} | {token.tipo} | {token.valor} |")
 
     # guardar
-    os.makedirs("output", exist_ok=True)
-    ruta = os.path.join("output", "tokens.md")
+    os.makedirs("outputs", exist_ok=True)
+    ruta = os.path.join("outputs", "tokens.md")
     with open(ruta, "w", encoding="utf-8") as f:
         f.write("\n".join(lineas))
 
