@@ -25,7 +25,6 @@ def exportar_errores_md(errores, nombre_archivo="errores.md"):
     ruta = os.path.join("outputs", nombre_archivo)
     with open(ruta, "w", encoding="utf-8") as f:
         f.write("\n".join(filas) + "\n")
-    print(f" Errores exportados en '{ruta}'")
 
 
 def main():
