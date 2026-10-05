@@ -7,10 +7,10 @@ class Token:
         self.valor = valor
 
     def __repr__(self):
-        return f"<{self.tipo}, {self.valor if self.tipo != 'EOF' else ''}>"
+        return f"<{self.tipo}, {'' if self.valor is None else self.valor}>"
 
     def __str__(self):
-        return f"<{self.tipo}, {self.valor if self.tipo != 'EOF' else ''}>"
+        return f"<{self.tipo}, {'' if self.valor is None else self.valor}>"
 
 
 # formalidad del manejo de errores
@@ -25,7 +25,9 @@ def exportar_tokens(tokens: list[Token]) -> None:
     lineas.append("|---|---|---|")
 
     for i, token in enumerate(tokens, start=1):
-        lineas.append(f"| {i} | {token.tipo} | {token.valor} |")
+        lineas.append(
+            f"| {i} | {token.tipo} | {token.valor if token.valor is not None else ''} |"
+        )
 
     # guardar
     os.makedirs("outputs", exist_ok=True)

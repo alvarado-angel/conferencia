@@ -1,3 +1,5 @@
+from tkinter import N
+
 from .reservadas import *
 from .token import *
 
@@ -19,12 +21,12 @@ def tokenizar(cadena: str) -> tuple[list[Token], list[Exception]]:
         if caracter in reservadas:
             # potencia es un caso especial
             if caracter == "*" and pos + 1 < len(cadena) and cadena[pos + 1] == "*":
-                token = Token(reservadas["**"], "**")
+                token = Token(reservadas["**"], None)
                 tokens.append(token)
                 pos += 2
                 continue
 
-            token = Token(reservadas[caracter], caracter)
+            token = Token(reservadas[caracter], None)
             tokens.append(token)
             pos += 1
             continue
@@ -44,5 +46,5 @@ def tokenizar(cadena: str) -> tuple[list[Token], list[Exception]]:
         )
         pos += 1
 
-    tokens.append(Token("EOF", ""))
+    tokens.append(Token("EOF", None))
     return tokens, errores

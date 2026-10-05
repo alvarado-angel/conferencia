@@ -22,7 +22,8 @@ class Parser:
 
     # errores
     def _error(self, err: Exception) -> None:
-        self.errores.append(err)
+        if not self.errores:
+            self.errores.append(err)
 
     def _sincronizar(self) -> None:
         while self._actual().tipo != "EOF":
@@ -104,14 +105,16 @@ class Parser:
 
             if self._actual().tipo == "PAR_DER":
                 self._avanzar()
-            elif not self.errores:  # evitamos la cascada de errores
-                self._error(
-                    ErrorSintactico(f'Se esperaba ")", se encontró {self._actual()}')
-                )
-                self._sincronizar()
+                return Nodo("V", [Nodo("("), cst_E, Nodo(")")]), ast_E
 
-            return Nodo("V", [Nodo("("), cst_E, Nodo(")")]), ast_E
+            # si no viene par der, hay error
+            self._error(
+                ErrorSintactico(f'Se esperaba ")", se encontró {self._actual()}')
+            )
+            self._sincronizar()
+            return None, None
 
+        # si no viene número o (
         self._error(
             ErrorSintactico(f'Se esperaba un número o "(", se encontró: {token}')
         )
