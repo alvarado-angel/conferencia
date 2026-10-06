@@ -21,12 +21,12 @@ def tokenizar(cadena: str) -> tuple[list[Token], list[Exception]]:
         if caracter in reservadas:
             # potencia es un caso especial
             if caracter == "*" and pos + 1 < len(cadena) and cadena[pos + 1] == "*":
-                token = Token(reservadas["**"], None)
+                token = Token(reservadas["**"], "**")
                 tokens.append(token)
                 pos += 2
                 continue
 
-            token = Token(reservadas[caracter], None)
+            token = Token(reservadas[caracter], caracter)
             tokens.append(token)
             pos += 1
             continue

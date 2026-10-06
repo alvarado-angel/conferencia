@@ -3,6 +3,23 @@ from scanner import Token
 from .nodos import *
 
 
+# gramática
+# S -> E 'EOF'
+# E -> E '+'/'-' T
+#   | T
+# T -> T '*'/'/' F
+#   | F
+# F -> '-' F
+#   | P
+# P -> V ** F
+#   | V
+# V -> '(' E ')'
+#   | numero
+# ambigua y recursiva por izq
+# no terminales min
+# terminales mayus
+
+
 class Parser:
     def __init__(self, tokens: list[Token]):
         self.tokens = tokens
@@ -28,19 +45,6 @@ class Parser:
     def _sincronizar(self) -> None:
         while self._actual().tipo != "EOF":
             self._avanzar()
-
-    # gramática
-    # S -> E 'EOF'
-    # E -> E '+'/'-' T
-    #   | T
-    # T -> T '*'/'/' F
-    #   | F
-    # F -> '-' F
-    #   | P
-    # P -> V ** F
-    #   | V
-    # V -> '(' E ')'
-    #   | numero
 
     def _E(self):
         cst_izq, ast = self._T()
